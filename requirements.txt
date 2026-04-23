@@ -1,5 +1,5 @@
 feedparser==6.0.11
-anthropic[vertex]>=0.54.0
+google-genai>=1.36.0
 python-dotenv==1.1.0
 requests==2.32.3
 slack-sdk==3.35.0

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 
-from anthropic import AnthropicVertex
+from google import genai
 
 from app.models import Article, RankedItem, WeeklyBrief
 
@@ -35,7 +35,7 @@ Rules:
 
 
 def create_weekly_brief(
-    client: AnthropicVertex,
+    client: genai.Client,
     model: str,
     articles: list[Article],
     start_date: str,
@@ -60,21 +60,12 @@ def create_weekly_brief(
         f"Candidates:\n{json.dumps(payload, ensure_ascii=False)}"
     )
 
-    response = client.messages.create(
+    response = client.models.generate_content(
         model=model,
-        max_tokens=2500,
-        system=SYSTEM_PROMPT,
-        messages=[
-            {
-                "role": "user",
-                "content": prompt,
-            }
-        ],
+        contents=f"{SYSTEM_PROMPT}\n\n{prompt}",
     )
 
-    response_text = "".join(
-        block.text for block in response.content if getattr(block, "type", "") == "text"
-    )
+    response_text = response.text or ""
     parsed = json.loads(response_text)
     items = [
         RankedItem(

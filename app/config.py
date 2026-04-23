@@ -13,7 +13,7 @@ load_dotenv()
 class Settings:
     google_cloud_project: str
     vertex_region: str
-    anthropic_vertex_model: str
+    gemini_model: str
     slack_bot_token: str
     slack_channel_id: str
     lookback_days: int
@@ -25,9 +25,9 @@ def get_settings() -> Settings:
     return Settings(
         google_cloud_project=os.getenv("GOOGLE_CLOUD_PROJECT", ""),
         vertex_region=os.getenv("VERTEX_REGION", "us-east5"),
-        anthropic_vertex_model=os.getenv(
-            "ANTHROPIC_VERTEX_MODEL",
-            "claude-sonnet-4@20250514",
+        gemini_model=os.getenv(
+            "GEMINI_MODEL",
+            os.getenv("ANTHROPIC_VERTEX_MODEL", "gemini-2.5-pro"),
         ),
         slack_bot_token=os.getenv("SLACK_BOT_TOKEN", ""),
         slack_channel_id=os.getenv("SLACK_CHANNEL_ID", ""),

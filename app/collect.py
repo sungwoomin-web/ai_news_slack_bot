@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import re
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 
 import feedparser
@@ -16,7 +16,7 @@ USER_AGENT = "weekly-ai-news-bot/0.1"
 
 
 def collect_articles(lookback_days: int, max_per_source: int) -> list[Article]:
-    cutoff = datetime.now(UTC) - timedelta(days=lookback_days)
+    cutoff = datetime.now(timezone.utc) - timedelta(days=lookback_days)
     articles: list[Article] = []
 
     session = requests.Session()
@@ -74,7 +74,7 @@ def collect_from_feed(
             source_name=source.name,
             source_kind=source.kind,
             category_hint=source.category_hint,
-            published_at=(published or datetime.now(UTC)).date().isoformat(),
+            published_at=(published or datetime.now(timezone.utc)).date().isoformat(),
             dedupe_key=make_dedupe_key(title, url),
         )
         articles.append(article)
@@ -93,8 +93,8 @@ def parse_entry_datetime(entry: feedparser.FeedParserDict) -> datetime | None:
         try:
             dt = parsedate_to_datetime(raw)
             if dt.tzinfo is None:
-                return dt.replace(tzinfo=UTC)
-            return dt.astimezone(UTC)
+                return dt.replace(tzinfo=timezone.utc)
+            return dt.astimezone(timezone.utc)
         except (TypeError, ValueError, IndexError):
             continue
     return None

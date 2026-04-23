@@ -4,7 +4,7 @@ import argparse
 from datetime import date, timedelta
 from pathlib import Path
 
-from anthropic import AnthropicVertex
+from google import genai
 
 from app.collect import collect_articles
 from app.config import get_settings
@@ -43,13 +43,14 @@ def main() -> None:
         max_per_source=settings.max_per_source,
     )
 
-    client = AnthropicVertex(
-        project_id=settings.google_cloud_project,
-        region=settings.vertex_region,
+    client = genai.Client(
+        vertexai=True,
+        project=settings.google_cloud_project,
+        location=settings.vertex_region,
     )
     brief = create_weekly_brief(
         client=client,
-        model=settings.anthropic_vertex_model,
+        model=settings.gemini_model,
         articles=articles,
         start_date=start_date,
         end_date=end_date,
