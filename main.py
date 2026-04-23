@@ -4,7 +4,7 @@ import argparse
 from datetime import date, timedelta
 from pathlib import Path
 
-from openai import OpenAI
+from anthropic import AnthropicVertex
 
 from app.collect import collect_articles
 from app.config import get_settings
@@ -28,8 +28,8 @@ def main() -> None:
     args = parse_args()
     settings = get_settings()
 
-    if not settings.openai_api_key:
-        raise RuntimeError("OPENAI_API_KEY is required")
+    if not settings.google_cloud_project:
+        raise RuntimeError("GOOGLE_CLOUD_PROJECT is required")
 
     if not args.dry_run and (not settings.slack_bot_token or not settings.slack_channel_id):
         raise RuntimeError("SLACK_BOT_TOKEN and SLACK_CHANNEL_ID are required unless --dry-run is used")
@@ -43,10 +43,13 @@ def main() -> None:
         max_per_source=settings.max_per_source,
     )
 
-    client = OpenAI(api_key=settings.openai_api_key)
+    client = AnthropicVertex(
+        project_id=settings.google_cloud_project,
+        region=settings.vertex_region,
+    )
     brief = create_weekly_brief(
         client=client,
-        model=settings.openai_model,
+        model=settings.anthropic_vertex_model,
         articles=articles,
         start_date=start_date,
         end_date=end_date,

@@ -11,8 +11,9 @@ load_dotenv()
 
 @dataclass(frozen=True)
 class Settings:
-    openai_api_key: str
-    openai_model: str
+    google_cloud_project: str
+    vertex_region: str
+    anthropic_vertex_model: str
     slack_bot_token: str
     slack_channel_id: str
     lookback_days: int
@@ -22,8 +23,12 @@ class Settings:
 
 def get_settings() -> Settings:
     return Settings(
-        openai_api_key=os.getenv("OPENAI_API_KEY", ""),
-        openai_model=os.getenv("OPENAI_MODEL", "gpt-5"),
+        google_cloud_project=os.getenv("GOOGLE_CLOUD_PROJECT", ""),
+        vertex_region=os.getenv("VERTEX_REGION", "us-east5"),
+        anthropic_vertex_model=os.getenv(
+            "ANTHROPIC_VERTEX_MODEL",
+            "claude-sonnet-4@20250514",
+        ),
         slack_bot_token=os.getenv("SLACK_BOT_TOKEN", ""),
         slack_channel_id=os.getenv("SLACK_CHANNEL_ID", ""),
         lookback_days=int(os.getenv("NEWS_LOOKBACK_DAYS", "7")),

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 
-from openai import OpenAI
+from anthropic import AnthropicVertex
 
 from app.models import Article, RankedItem, WeeklyBrief
 
@@ -35,7 +35,7 @@ Rules:
 
 
 def create_weekly_brief(
-    client: OpenAI,
+    client: AnthropicVertex,
     model: str,
     articles: list[Article],
     start_date: str,
@@ -60,13 +60,22 @@ def create_weekly_brief(
         f"Candidates:\n{json.dumps(payload, ensure_ascii=False)}"
     )
 
-    response = client.responses.create(
+    response = client.messages.create(
         model=model,
-        instructions=SYSTEM_PROMPT,
-        input=prompt,
+        max_tokens=2500,
+        system=SYSTEM_PROMPT,
+        messages=[
+            {
+                "role": "user",
+                "content": prompt,
+            }
+        ],
     )
 
-    parsed = json.loads(response.output_text)
+    response_text = "".join(
+        block.text for block in response.content if getattr(block, "type", "") == "text"
+    )
+    parsed = json.loads(response_text)
     items = [
         RankedItem(
             title=item["title"],
